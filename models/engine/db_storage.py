@@ -15,8 +15,10 @@ class DBStorage:
     
     def __init__(self):
         """creates engine and instanciates"""
-        database_url = os.getenv('DATABASE_URL', 'mysql+mysqlconnector://temp:password@localhost/mydatabase')
-        print(f"Using database URL: {database_url}")
+        database_url = (
+            f"mysql+mysqlconnector://{os.getenv('MYSQLUSER')}:{os.getenv('MYSQLPASSWORD')}"
+            f"@{os.getenv('MYSQLHOST')}:{os.getenv('MYSQLPORT')}/{os.getenv('MYSQLDATABASE')}"
+        )
         self.__engine = create_engine(database_url)
     
     def all(self, cls=None):
