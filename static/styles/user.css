@@ -1,0 +1,219 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: url("../images/header_back.jpg");
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+}
+.logo {
+  width: 150px;
+  height: 123px;
+  background: url("../icons/iman-caffe-high-resolution-logo\ \(1\).png");
+  padding-left: 30px;
+  margin-left: 100px;
+  background-size: contain;
+}
+.navbarContent {
+  list-style-type: none;
+  overflow: hidden;
+  margin-left: 350px;
+  align-items: center;
+  justify-content: center;
+}
+.navbarContent li {
+  float: left;
+}
+.navbarContent li a {
+  display: block;
+  text-decoration: none;
+  color: #293040;
+  font-size: 30px;
+  margin-left: 100px;
+}
+.navbarContent li a:hover {
+  color: black;
+}
+.vertical {
+  list-style-type: none;
+  margin-top: 10px;
+  margin-left: 100px;
+  padding-left: 0px;
+  padding-bottom: 40px;
+  width: 25%;
+  background-color: white;
+  height: 485px;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  float: left;
+}
+
+.vertical li a {
+  display: block;
+  text-decoration: none;
+  color: black;
+  font-size: 30px;
+  margin-bottom: 20px;
+  padding-top: 20px;
+}
+
+.vertical li a.active {
+  color: white;
+  background-color: silver;
+}
+
+.vertical li a:hover:not(.active) {
+  color: white;
+  background-color: silver;
+}
+.userinfo {
+  border: none;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  float: left;
+  width: 60%;
+  height: auto;
+  margin-top: 3px;
+  margin-left: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  justify-content: left;
+}
+.userinfo h2 {
+  text-align: center;
+}
+.userinfo h3 {
+  border-bottom: 0.5px solid;
+}
+.account-details {
+  float: left;
+  width: 44%;
+  font-size: 15px;
+  border-style: groove;
+  border-radius: 4px;
+  height: 200px;
+  margin-left: 20px;
+  padding-left: 10px;
+}
+.adress {
+  float: left;
+  width: 44%;
+  font-size: 15px;
+  border-style: groove;
+  height: 200px;
+  margin-left: 400px;
+  margin-top: -205px;
+  padding-left: 10px;
+  border-radius: 3px;
+}
+.credit {
+  float: left;
+  width: 44%;
+  font-size: 15px;
+  border-style: groove;
+  border-radius: 4px;
+  height: 200px;
+  margin-left: 20px;
+  margin-top: 27px;
+  padding-left: 10px;
+}
+.news {
+  float: left;
+  width: 44%;
+  font-size: 15px;
+  border-style: groove;
+  height: 200px;
+  margin-left: 400px;
+  margin-top: -205px;
+  padding-left: 10px;
+  border-radius: 3px;
+}
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 50px 0 0;
+}
+.account-details:hover,
+.adress:hover,
+.credit:hover,
+.news:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transform: translate(0px, -8px);
+}
+.product {
+  width: 20%;
+  margin: 15px;
+  box-sizing: border-box;
+  float: left;
+  text-align: center;
+  border-radius: 20px;
+  padding-top: 10px;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  transition: 0.5s;
+  background: #3e4961;
+}
+.product:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transform: translate(0px, -8px);
+}
+
+img {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  height: 200px;
+  display: block;
+  border-radius: 20px;
+}
+
+h2 {
+  text-align: center;
+  padding-top: 0 8px;
+  color: white;
+}
+
+.content p {
+  margin-top: 2px;
+  color: white;
+}
+
+h6 {
+  font-size: 23px;
+  text-align: center;
+  color: navajowhite;
+  margin: 0;
+}
+#price {
+  text-align: left;
+}
+.cartButton {
+  border-radius: 12px;
+  color: #333;
+  background-color: #d5b263;
+  width: 95px;
+  height: 30px;
+  cursor: pointer;
+  border: none;
+  margin-bottom: 8px;
+}
+.input_bar {
+  padding-top: 0px;
+  width: 75%;
+  margin-top: 7px;
+}
+.sub_but {
+  margin-top: 10px;
+  margin-left: 30px;
+  color: #d5b263;
+  background-color: #293040;
+  cursor: pointer;
+}

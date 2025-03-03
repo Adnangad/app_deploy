@@ -1,0 +1,259 @@
+header {
+  background: url("../images/header_back.jpg");
+  width: 97%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+.sign_but {
+  border: none;
+  width: 100px;
+  color: #293040;
+  margin-top: 20px;
+  background-color: #d5b263;
+  padding: 10px 20px;
+  font-size: 17px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.logo {
+  width: 150px;
+  height: 125px;
+  background: url("../icons/iman-caffe-high-resolution-logo\ \(1\).png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.info ul {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.info ul li {
+  margin-left: 20px;
+  margin-right: 5px;
+}
+
+li a {
+  display: block;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 10px;
+}
+
+.popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: #293040;
+  padding: 20px;
+  border: 1.5px solid black;
+  width: 100%;
+  font-weight: bolder;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: #d5b263;
+}
+
+.popup-content button {
+  margin: 10px auto;
+  padding: 10px 20px;
+}
+
+#loginForm,
+#signupForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input_bar {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-top: 15px;
+  font-size: 15px;
+}
+
+#ClosePopup,
+#ClosesignPopup {
+  align-self: flex-end;
+  color: #293040;
+  background-color: #d5b263;
+  border-radius: 2px;
+  padding: 5px 10px;
+  margin-bottom: 15px;
+}
+
+#ClosePopup:hover,
+#ClosesignPopup:hover {
+  transform: translate(0px, -8px);
+}
+
+.show {
+  display: flex;
+}
+
+.large_img {
+  background: url("../images/food_back.jpg");
+  background-size: cover;
+  background-position: center;
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.large_img .slogan {
+  color: #fff;
+  font-size: 32px;
+  font-family: "Lucida Sans", Geneva, Verdana, sans-serif;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  padding: 20px;
+}
+
+.search_bar {
+  border: none;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.location_search {
+  width: 60%;
+  max-width: 450px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+}
+
+.search {
+  border: none;
+  color: #293040;
+  background-color: #d5b263;
+  padding: 10px 20px;
+  font-size: 17px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+footer {
+  background: url("../images/header_back.jpg");
+  color: black;
+  padding: 20px 0;
+}
+
+.footer-content-wrapper {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.footer-col {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+}
+
+.footer-col h3 {
+  margin-bottom: 10px;
+}
+
+.footer-col a {
+  color: #d5b263;
+  text-decoration: none;
+  display: block;
+  margin: 5px 0;
+}
+
+.footer-col a:hover {
+  color: #ffffff;
+  transform: translate(0px, -8px);
+}
+
+@media (max-width: 768px) {
+  header {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .info ul {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .info ul li {
+    margin: 10px 0;
+  }
+
+  .large_img {
+    height: auto;
+    padding: 50px 0;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .large_img .slogan {
+    font-size: 24px;
+  }
+
+  .footer-content-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-col {
+    text-align: center;
+  }
+}

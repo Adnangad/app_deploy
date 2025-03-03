@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/user.css') }}?cache_id={{ cache_id }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <style>
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo"></div>
+    <section class="navbar">
+        <ul class="navbarContent">
+            <li><a href="/menu">Menu</a></li>
+            <li><a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </section>
+</header>
+<ul class="vertical">
+    <li><a class="active" href="#home"><i class="fa-solid fa-user"></i>My account</a></li>
+    <li><a href="/moreinfo">News</a></li>
+    <li><a href="/moreinfo">Contact</a></li>
+    <li><a href="/moreinfo">About</a></li>
+</ul>
+<section class="userinfo">
+    <h2>Account Overview</h2>
+    <div class="account-details">
+        <h3>ACCOUNT DETAILS</h3>
+        <p id="prevname">Name: {{ user.name }}</p>
+        <p>Email: {{ user.email }}</p>
+    </div>
+    <div class="adress">
+        <h3>ADDRESS BOOK</h3>
+        <p id="prevloc">Shipping Address: {{ user.location }}</p>
+        <p id="prevpass" style="display: none;">{{ user.password }}</p>
+    </div>
+    <div class="credit">
+        <h3>Update Details</h3>
+        <form id="updateForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter Your name" class="input_bar"/><br/>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter Password" class="input_bar"/><br/>
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" placeholder="Please enter your location" class="input_bar">
+            <input type="submit" value="Submit" class="sub_but">
+        </form>
+        <div id="sign_upMessage"></div>
+    </div>
+    <div class="news">
+        <h3>Delete Account</h3>
+        <p>To delete your account, press the button below.</p>
+        <p>Please note that you will not be able to access our service unless you sign up again.</p>
+        <button style="background-color: #d5b263;">
+            <a href="/delete_user" style="text-decoration: none; color: #000;">Delete Account</a>
+        </button>
+    </div>
+</section>
+<h3 style="float: left;">Recommended for you</h3>
+<div class="content">
+    {% for stock in stocks %}
+    <div class="product">
+        <img src="{{ url_for('static', filename=stock.image) }}" alt="{{ stock.product }}" class="image">
+        <h2>{{ stock.product }}</h2>
+        <p>{{ stock.description }}</p>
+        <h6>ksh{{ stock.value }}</h6>
+        <p>{{ stock.category }}</p>
+        <button class="cartButton cart" onclick="checkitem('{{ stock.id }}')">
+            <i class="fa-solid fa-cart-plus"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    function checkitem(stock_id) {
+        window.location.href = '/checkitem/' + stock_id;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('updateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var name = document.getElementById('name').value;
+            var location = document.getElementById('location').value;
+            var passwd = document.getElementById('password').value;
+
+            if (!name) {
+                name = document.getElementById('prevname').textContent.split(': ')[1];
+            }
+            if (!passwd) {
+                passwd = document.getElementById('prevpass').textContent;
+            }
+            if (!location) {
+                location = document.getElementById('prevloc').textContent.split(': ')[1];
+            }
+
+            const response = await fetch("/update_user", {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({name: name, location: location, password: passwd}),
+            });
+
+            const data = await response.json();
+            const messageElement = document.getElementById('sign_upMessage');
+
+            if (response.status === 200) {
+                messageElement.textContent = data.message;
+                messageElement.className = 'success';
+                window.location.href = '/user';
+            } else {
+                messageElement.textContent = data.message;
+                messageElement.className = 'error';
+            }
+        });
+    });
+</script>
+</body>
+</html>
