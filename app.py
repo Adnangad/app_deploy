@@ -3,6 +3,7 @@ from models.user import User
 from models import storage
 from models.area import Area
 from models.stock import Stock
+from flask_cors import CORS
 from models.cart import Cart
 from uuid import uuid4
 import os
@@ -16,6 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+CORS(app)
 cache_id = uuid4()
 SMTP_SERVER = os.getenv('SERVER')
 SMTP_PORT = 587
