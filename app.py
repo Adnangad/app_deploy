@@ -76,7 +76,8 @@ def sign_in():
                     session['user_id'] = real_user.id
                     return jsonify({'message': 'Login successful', 'user': real_user.to_dict()}), 200
         return jsonify({'message': 'Invalid email or password.'}), 401
-    except SQLAlchemyError as e:
+    except Exception as e:
+        print(e)
         storage.rollback()
         return jsonify({'message': str(e)}), 500
 
