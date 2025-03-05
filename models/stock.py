@@ -10,3 +10,13 @@ class Stock(BaseModel, Base):
     description = Column(String(300))
     image = Column(String(200))
     category = Column(String(80), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "product": self.product,
+            "description": self.description,
+            "value": self.value,
+            "category": self.category,
+            "image": self.image,
+        }

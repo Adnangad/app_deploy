@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, render_template, url_for, session
+from flask import Flask, request, jsonify, redirect, render_template, url_for, session, send_from_directory, json
 from models.user import User
 from models import storage
 from models.area import Area
@@ -15,7 +15,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from sqlalchemy.exc import SQLAlchemyError
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 CORS(app)
 cache_id = uuid4()
@@ -26,10 +26,9 @@ SMTP_PASSWORD = os.getenv('SMTP-PASSWORD')
 FROM_EMAIL = os.getenv('EMAIL')
 CREATOR_EMAIL = os.getenv('EMAIL')
 
-@app.route("/", strict_slashes=False)
-def index():
-    """Returns the home page"""
-    return render_template("index.html", cache_id=cache_id)
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
 
 @app.route("/location", methods=['POST'])
 def check_Area():
@@ -96,134 +95,123 @@ def sign_up():
 
 @app.route("/add_to_cart", methods=['POST'])
 def add_to_cart():
-    """Adds an item to the cart"""
-    if 'user_id' not in session:
-        return jsonify({'message': 'Please login.'}), 401    
+    """Adds an item to the cart"""   
     try:
-        user_id = session['user_id']
-        user = storage.get(User, user_id)    
-        if not user:
-            return jsonify({'message': 'User not found. Please login again.'}), 401    
         data = request.get_json()
         if not data:
-            return jsonify({'message': 'Request must be JSON.'}), 400    
-        if 'item' not in data or 'price' not in data or 'image' not in data:
-            return jsonify({'message': 'Missing item name, price, or image.'}), 400
-        cart_item = Cart(user_id=user_id, item=data['item'], price=data['price'], image=data['image'])
+            return jsonify({'message': 'Request must be JSON.'}), 400
+        if isinstance(data['user'], dict):
+            userz = data['user']
+            user = storage.get(User, userz['id'])
+        else:
+            userz = json.loads(data['user'])
+            user = storage.get(User, userz['id'])
+        stock = data['stock']
+        
+        if not user:
+            return jsonify({'message': 'User not found. Please login again.'}), 401    
+            
+        cart_item = Cart(user_id=user.id, item=stock['product'], price=stock['value'], image=stock['image'])
         storage.new(cart_item)
         storage.save()
-        number_of_items = sum(1 for cart in storage.all(Cart).values() if cart.user_id == user_id and cart.item == cart_item.item)
+        storage.reload()
+        number_of_items = sum(1 for cart in storage.all(Cart).values() if cart.user_id == user.id and cart.item == cart_item.item)
         return jsonify({'message': 'Item added to cart successfully', 'number_of_items': number_of_items, 'cart_item': cart_item.id}), 200
-    except SQLAlchemyError as e:
+    except Exception as e:
         storage.rollback()
+        print(e)
         return jsonify({'message': str(e)}), 500
 
-@app.route('/remove_item/<cart_id>', methods=['DELETE'])
-def remove_from_cart(cart_id):
+@app.route('/remove_item', methods=['DELETE'])
+def remove_from_cart():
     """Removes an item from the cart"""
     try:
-        cart_item = storage.get(Cart, cart_id)
+        print("here it starts")
+        data = request.get_json()
+        print(data)
+        if not data:
+            return jsonify({'message': 'Request must be JSON.'}), 400
+        if isinstance(data['user'], dict):
+            userz = data['user']
+            user = storage.get(User, userz['id'])
+        else:
+            userz = json.loads(data['user'])
+            user = storage.get(User, userz['id'])
+        if not user:
+            return jsonify({'message': 'Please login.'}), 401
+        cart_item = storage.get(Cart, data['cart_id'])
         if cart_item is None:
             return jsonify({'message': 'Not found'}), 400
         storage.delete(cart_item)
         storage.save()
-        if 'user_id' not in session:
-            return jsonify({'message': 'Please login.'}), 401    
-        user_id = session['user_id']
-        user = storage.get(User, user_id)
-        number_of_items = sum(1 for cart in storage.all(Cart).values() if cart.user_id == user_id and cart.item == cart_item.item)
+        storage.reload()
+        print("Its deleeted")
+        number_of_items = sum(1 for cart in storage.all(Cart).values() if cart.user_id == user.id and cart.item == cart_item.item)
         return jsonify({'message': 'Item removed from cart successfully', 'number_of_items': number_of_items}), 200
-    except SQLAlchemyError as e:
+    except Exception as e:
         storage.rollback()
+        print(e)
         return jsonify({'message': str(e)}), 500
 
 
-@app.route("/menu", methods=['GET'], strict_slashes=False)
+@app.route("/getmenu", methods=['GET'], strict_slashes=False)
 def get_menu():
-    """Renders the menu page"""
+    """Renders the menu page with optional category filtering"""
     try:
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', 10, type=int)
-        stocks = sorted(list(storage.all(Stock).values()), key=lambda x: x.product)
+        category = request.args.get('category', None)
+
+        stocks = list(storage.all(Stock).values())
+
+        if category and category.lower() != "all_items":
+            stocks = [stock for stock in stocks if stock.category.lower() == category.lower()]
+
+        stocks.sort(key=lambda x: x.product)
+
         total_stocks = len(stocks)
-        total_pages = (total_stocks + limit - 1) // limit  # Calculate total pages
+        total_pages = (total_stocks + limit - 1) // limit
         start = (page - 1) * limit
         end = start + limit
         paginated_stocks = stocks[start:end]
 
-        if 'user_id' not in session:
-            return render_template('menu.html', stocks=paginated_stocks, page=page, total_pages=total_pages, cache_id=cache_id)
+        stocks_dict = [stock.to_dict() for stock in paginated_stocks]
+
+        return jsonify({'stocks': stocks_dict, 'page': page, 'total_pages': total_pages}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/cart/<user_id>", methods=["GET"])
+def show_cart(user_id):
+    """Returns the cart page with a list of items in the cart"""
+    try:
+        user = storage.get(User, user_id)
+        if not user:
+            return jsonify({'message': 'Please login.'}), 401
         
-        user_id = session['user_id']
-        user = storage.get(User, user_id)
-        return render_template('menu.html', stocks=paginated_stocks, page=page, total_pages=total_pages, cache_id=cache_id, user=user)
-    except SQLAlchemyError as e:
-        storage.rollback()
-        return jsonify({'message': str(e)}), 500
-
-@app.route("/menu/<category>", methods=['GET'], strict_slashes=False)
-def get_menu_cat(category):
-    """Returns the menu page with the selected category"""
-    try:
-        stocks = sorted(list(storage.all(Stock).values()), key=lambda x: x.product)
-        if 'user_id' not in session:
-            if category.lower() == 'all_items':
-                return render_template('menu.html', stocks=stocks, cache_id=cache_id)
-            else:
-                filtered_stocks = [stock for stock in stocks if stock.category.lower() == category.lower()]
-                return render_template('menu.html', stocks=filtered_stocks, cache_id=cache_id)
-            
-        user_id = session['user_id']
-        user = storage.get(User, user_id)
-        stocks = sorted(list(storage.all(Stock).values()), key=lambda x: x.product)
-
-        if category.lower() == 'all_items':
-            return render_template('menu.html', stocks=stocks, cache_id=cache_id, user=user)
-        else:
-            filtered_stocks = [stock for stock in stocks if stock.category.lower() == category.lower()]
-            return render_template('menu.html', stocks=filtered_stocks, cache_id=cache_id, user=user)
-    except SQLAlchemyError as e:
-        storage.rollback()
-        return jsonify({'message': str(e)}), 500
-
-@app.route('/checkitem/<stock_id>')
-def check_item(stock_id):
-    """Returns an item"""
-    try:
-        stock = storage.get(Stock, stock_id)
-        stocks = sorted(list(storage.all(Stock).values()), key=lambda x: x.product)
-        if 'user_id' not in session:
-            return render_template('item.html', stock=stock)
-        user_id = session['user_id']
-        user = storage.get(User, user_id)
-        return render_template('item.html', stock=stock, user=user, stocks=stocks)
-    except SQLAlchemyError as e:
-        storage.rollback()
-        return jsonify({'message': str(e)}), 500
-
-@app.route("/cart", methods=["GET"])
-def show_cart():
-    """Returns the cart page witha list of items in the cart"""
-    if 'user_id' not in session:
-        return jsonify({'message': 'Please login.'}), 401
-    try:
-        user_id = session['user_id']
-        user = storage.get(User, user_id)
         carts = sorted(list(storage.all(Cart).values()), key=lambda x: x.item)
-        
         grouped_carts = defaultdict(lambda: {'count': 0, 'details': {}})
         total_price = 0
-
+        print("here")
         for cart in carts:
             if cart.user_id == user.id:
                 item_name = cart.item
                 grouped_carts[item_name]['count'] += 1
-                grouped_carts[item_name]['details'] = cart
+                grouped_carts[item_name]['details'] = {
+                    'id': cart.id,
+                    'user_id': cart.user_id,
+                    'item': cart.item,
+                    'price': float(cart.price),  # Ensure it's a serializable number
+                    'image': cart.image
+                }
                 total_price += float(cart.price)
         
-        return render_template('cart.html', user=user, grouped_carts=grouped_carts, cache_id=cache_id, total_price=total_price)
-    except SQLAlchemyError as e:
+        return jsonify({'user': {'id': user.id, 'name': user.name}, 'grouped_carts': dict(grouped_carts), 'total_price': total_price}), 200
+
+    except Exception as e:
         storage.rollback()
+        print(e)
         return jsonify({'message': str(e)}), 500
 
 @app.route('/user/', methods=['GET'])
@@ -245,17 +233,17 @@ def log_out():
     del(session['user_id'])
     return render_template('index.html', cache_id=cache_id)
 
-@app.route('/delete_user', methods=['DELETE'])
-def delete_user():
+@app.route('/delete_user/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
     """Deletes a user from the database"""
     try:
-        user_id = session['user_id']
         user = storage.get(User, user_id)
         storage.delete(user)
         del(session['user_id'])
         storage.save()
+        storage.reload()
         return jsonify({"message":"Your account has been deleted permanently"}), 200
-    except SQLAlchemyError as e:
+    except Exception as e:
         storage.rollback()
         return jsonify({'message': str(e)}), 500
 
@@ -263,16 +251,18 @@ def delete_user():
 def update_user():
     """Updates the users details"""
     try:
-        user_id = session['user_id']
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Data must be in json format"}), 400
+        user_id = data['user_id']
         user = storage.get(User, user_id)
         if not user:
-            return jsonify({"message": "User doesn't exist"}), 400
-        data = request.get_json()
+            return jsonify({"error": "User doesn't exist"}), 400
         for key, value in data.items():
-            if key not in ['id', 'email']:
+            if key not in ['user_id', 'email']:
                 setattr(user, key, value)
         user.save()
-        return jsonify({"message": "You have successfully updated your details"})
+        return jsonify({"message": "You have successfully updated your details"}), 200
     except SQLAlchemyError as e:
         storage.rollback()
         return jsonify({'message': str(e)}), 500
@@ -323,5 +313,5 @@ def mobile_payment():
         return jsonify({'message': str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=True)
