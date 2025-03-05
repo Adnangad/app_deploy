@@ -228,10 +228,6 @@ def user_info():
         storage.rollback()
         return jsonify({'message': str(e)}), 500
 
-@app.route('/logout', methods=['GET'])
-def log_out():
-    del(session['user_id'])
-    return render_template('index.html', cache_id=cache_id)
 
 @app.route('/delete_user/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
@@ -287,9 +283,8 @@ def send_email(user_email, creator_email, order_details):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
-@app.route('/payment', methods=['POST'])
+"""@app.route('/payment', methods=['POST'])
 def mobile_payment():
-    """Calls the method send_mail"""
     if 'user_id' not in session:
         return jsonify({'message': 'Please login.'}), 401
     try:
@@ -310,8 +305,7 @@ def mobile_payment():
         return render_template('success.html', user=user)
     except SQLAlchemyError as e:
         storage.rollback()
-        return jsonify({'message': str(e)}), 500
+        return jsonify({'message': str(e)}), 500"""
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5001))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
