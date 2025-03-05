@@ -270,8 +270,7 @@ def update_user():
         storage.rollback()
         return jsonify({'message': str(e)}), 500
 
-def send_email(user_email, creator_email, order_details):
-    """Sends mail"""
+"""def send_email(user_email, creator_email, order_details):
     message = MIMEMultipart()
     message['From'] = FROM_EMAIL
     message['To'] = ', '.join([user_email, creator_email])
@@ -288,7 +287,7 @@ def send_email(user_email, creator_email, order_details):
             server.sendmail(FROM_EMAIL, [user_email, creator_email], message.as_string())
         print("Email sent successfully")
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        print(f"Failed to send email: {e}")"""
 
 """@app.route('/payment', methods=['POST'])
 def mobile_payment():
@@ -316,5 +315,5 @@ def mobile_payment():
 
 if __name__ == '__main__':
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
