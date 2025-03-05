@@ -14,21 +14,28 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from sqlalchemy.exc import SQLAlchemyError
+from instances import initialize_db
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 CORS(app)
 cache_id = uuid4()
-SMTP_SERVER = os.getenv('SERVER')
+"""SMTP_SERVER = os.getenv('SERVER')
 SMTP_PORT = 587
 SMTP_USERNAME = os.getenv('USERNAME')
 SMTP_PASSWORD = os.getenv('SMTP-PASSWORD')
 FROM_EMAIL = os.getenv('EMAIL')
-CREATOR_EMAIL = os.getenv('EMAIL')
+CREATOR_EMAIL = os.getenv('EMAIL')"""
+
+initialize_db()
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
     return send_from_directory('static', filename)
+
+@app.route('/')
+def home():
+    return "Successfully running"
 
 @app.route("/location", methods=['POST'])
 def check_Area():
@@ -310,4 +317,4 @@ def mobile_payment():
 if __name__ == '__main__':
     import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port)
